@@ -1,3 +1,4 @@
+using System;
 public static class ArraySelector
 {
     public static void Run()
@@ -11,6 +12,34 @@ public static class ArraySelector
 
     private static int[] ListSelector(int[] list1, int[] list2, int[] select)
     {
-        return [];
+        // Creamos una lista para los resultados
+        var results = new System.Collections.Generic.List<int>();
+
+        // Indices para recorrer list1 y list2
+        int index1 = 0, index2 = 0;
+
+        // Recorrer el arreglo select
+        foreach (var sel in select)
+        {
+            if (sel == 1) // seleccionar de list1
+            {
+             if (index1 < list1.Length) // Asegurarse de que no exceda el límite
+                {
+                    results.Add(list1[index1]);
+                    index1++; // Avanzar el índice de list1
+                }
+            }
+            else if (sel == 2) // Seleccionar de list2
+            {
+                if (index2 < list2.Length) // Asegurarse de que no exceda el límite
+                {
+                    results.Add(list2[index2]);
+                    index2++; // Avanzar el índice de list2
+                }
+            }
+        }
+
+        // Convertir la lista a un arreglo y devolverla
+        return results.ToArray();
     }
 }

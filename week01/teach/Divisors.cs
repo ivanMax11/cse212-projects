@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 public static class Divisors {
     /// <summary>
     /// Entry point for the Divisors class
@@ -16,9 +19,16 @@ public static class Divisors {
     /// </summary>
     /// <param name="number">The number to find the divisor</param>
     /// <returns>List of divisors</returns>
-    private static List<int> FindDivisors(int number) {
-        List<int> results = new();
-        // TODO problem 1
-        return results;
+private static List<int> FindDivisors(int number) {
+        List<int> results = new(); // Lista vacía para almacenar los divisores
+
+        // Iterar desde 1 hasta number - 1
+        for (int i = 1; i < number; i++) {
+            if (number % i == 0) { // Si el número es divisible por i
+                results.Add(i);    // Agregar i a la lista de divisores
+            }
+        }
+
+        return results; // Retornar la lista de divisores
     }
 }
