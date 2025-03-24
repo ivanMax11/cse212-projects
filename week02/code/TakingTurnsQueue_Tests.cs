@@ -12,6 +12,9 @@ public class TakingTurnsQueueTests
     // run until the queue is empty
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
     // Defect(s) Found: 
+    //      -The test fail because in some iteration the expected turns order not coincide with the real result.
+    //      -Shifts were expected to be filled correctly, but instead the wrong shift was selected
+    //      -This suggests that the logic behind `GetNextPerson()` is not handling shift rotation correctly
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -30,10 +33,13 @@ public class TakingTurnsQueueTests
         {
             if (i >= expectedResult.Length)
             {
+                // If this is executed, it means that the queue was not emptied correctly.
                 Assert.Fail("Queue should have ran out of items by now.");
             }
 
             var person = players.GetNextPerson();
+
+            // Error detected: Shift expected "expectedResult[i].Name", but get another value
             Assert.AreEqual(expectedResult[i].Name, person.Name);
             i++;
         }
@@ -44,6 +50,8 @@ public class TakingTurnsQueueTests
     // After running 5 times, add George with 3 turns.  Run until the queue is empty.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
     // Defect(s) Found: 
+    //      -The test could fail if `AddPerson()` not manage correctly the the insertion of a new player in the middle of the process.
+    //      -If the implementation of `GetNextPerson()` does not properly consider shifts after insertion, the order could be incorrect
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -86,6 +94,8 @@ public class TakingTurnsQueueTests
     // Run 10 times.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
     // Defect(s) Found: 
+    //      -If `GetNextPerson()` does not distinguish between infinite and finite values ​​correctly, there could be an error in the turn order
+    //      -If `tim.Turns` is converted to an extremely large number instead of being handled as infinite, the test will fail on the last check
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
@@ -117,6 +127,8 @@ public class TakingTurnsQueueTests
     // Run 10 times.
     // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
     // Defect(s) Found: 
+    //      -If `timTurns = -3` is handled incorrectly, it might not be considered as infinite
+    //      -`GetNextPerson()` might handle negative values ​​unexpectedly, causing Tim to not have infinite turns
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -144,6 +156,8 @@ public class TakingTurnsQueueTests
     // Scenario: Try to get the next person from an empty queue
     // Expected Result: Exception should be thrown with appropriate error message.
     // Defect(s) Found: 
+    //      -If `GetNextPerson()` does not handle the case of an empty queue, it could return `null` instead of throwing an exception
+    //      -If an incorrect exception is thrown or with a different message, the test will fail.
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();
