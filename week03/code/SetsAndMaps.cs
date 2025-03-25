@@ -168,7 +168,7 @@ public static class SetsAndMaps
 
     var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
 
-    // Extraer lugar y magnitud de cada terremoto
+    
     return featureCollection.Features
         .Select(f => $"{f.Properties.Place}: Magnitude {f.Properties.Mag}")
         .ToArray();
