@@ -14,8 +14,11 @@ public static class Recursion
     /// </summary>
     public static int SumSquaresRecursive(int n)
     {
-        // TODO Start Problem 1
-        return 0;
+        if (n <= 0)
+        {
+            return 0;
+        }
+        return n * n + SumSquaresRecursive(n - 1);
     }
 
     /// <summary>
@@ -39,7 +42,16 @@ public static class Recursion
     /// </summary>
     public static void PermutationsChoose(List<string> results, string letters, int size, string word = "")
     {
-        // TODO Start Problem 2
+        if (word.Length == size)
+        {
+            results.Add(word);
+            return;
+        }
+
+        foreach (char c in letters)
+        {
+            PermutationsChoose(results, letters.Remove(letters.IndexOf(c), 1), size, word + c);
+        }
     }
 
     /// <summary>
@@ -96,10 +108,23 @@ public static class Recursion
         if (s == 3)
             return 4;
 
-        // TODO Start Problem 3
+        // Initialize remember dictionary if null
+        remember ??= new Dictionary<int, decimal>();
+
+        // Check if we already have the result
+        if (remember.ContainsKey(s))
+        {
+            return remember[s];
+        }
 
         // Solve using recursion
-        decimal ways = CountWaysToClimb(s - 1) + CountWaysToClimb(s - 2) + CountWaysToClimb(s - 3);
+        decimal ways = CountWaysToClimb(s - 1, remember) + 
+                      CountWaysToClimb(s - 2, remember) + 
+                      CountWaysToClimb(s - 3, remember);
+        
+        // Store the result for future use
+        remember[s] = ways;
+        
         return ways;
     }
 
@@ -118,26 +143,66 @@ public static class Recursion
     /// </summary>
     public static void WildcardBinary(string pattern, List<string> results)
     {
-        // TODO Start Problem 4
-    }
-
-    /// <summary>
-    /// Use recursion to insert all paths that start at (0,0) and end at the
-    /// 'end' square into the results list.
-    /// </summary>
-    public static void SolveMaze(List<string> results, Maze maze, int x = 0, int y = 0, List<ValueTuple<int, int>>? currPath = null)
-    {
-        // If this is the first time running the function, then we need
-        // to initialize the currPath list.
-        if (currPath == null) {
-            currPath = new List<ValueTuple<int, int>>();
+        int wildcardIndex = pattern.IndexOf('*');
+        if (wildcardIndex == -1)
+        {
+            results.Add(pattern);
+            return;
         }
+
+        // Replace the first wildcard with 0 and recurse
+        WildcardBinary(pattern[..wildcardIndex] + '0' + pattern[(wildcardIndex + 1)..], results);
         
-        // currPath.Add((1,2)); // Use this syntax to add to the current path
-
-        // TODO Start Problem 5
-        // ADD CODE HERE
-
-        // results.Add(currPath.AsString()); // Use this to add your path to the results array keeping track of complete maze solutions when you find the solution.
+        // Replace the first wildcard with 1 and recurse
+        WildcardBinary(pattern[..wildcardIndex] + '1' + pattern[(wildcardIndex + 1)..], results);
     }
+
+/// <summary>
+/// Use recursion to insert all paths that start at (0,0) and end at the
+/// 'end' square into the results list.
+/// </summary>
+public static void SolveMaze(List<string> results, Maze maze, int x = 0, int y = 0, List<ValueTuple<int, int>>? currPath = null)
+{
+    // If this is the first time running the function, initialize currPath
+    if (currPath == null)
+    {
+        currPath = new List<ValueTuple<int, int>>();
+    }
+
+    // Add current position to the path
+    currPath.Add((x, y));
+
+    // Check if we've reached the end
+    if (maze.IsEnd(x, y))
+    {
+        results.Add(currPath.AsString());
+        currPath.RemoveAt(currPath.Count - 1); // Backtrack
+        return;
+    }
+
+    // Try moving in all four directions
+    // Right
+    if (maze.IsValidMove(currPath, x + 1, y))
+    {
+        SolveMaze(results, maze, x + 1, y, currPath);
+    }
+    // Down
+    if (maze.IsValidMove(currPath, x, y + 1))
+    {
+        SolveMaze(results, maze, x, y + 1, currPath);
+    }
+    // Left
+    if (maze.IsValidMove(currPath, x - 1, y))
+    {
+        SolveMaze(results, maze, x - 1, y, currPath);
+    }
+    // Up
+    if (maze.IsValidMove(currPath, x, y - 1))
+    {
+        SolveMaze(results, maze, x, y - 1, currPath);
+    }
+
+    // Backtrack
+    currPath.RemoveAt(currPath.Count - 1);
+}
 }
